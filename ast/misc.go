@@ -817,6 +817,68 @@ func (n *SetStmt) Accept(v Visitor) (Node, bool) {
 	return v.Leave(n)
 }
 
+// SetConfigStmt ...
+type SetConfigStmt struct {
+	stmtNode
+
+	ComponentOrInstance string
+	Name                string
+	Value               ExprNode
+}
+
+func (n *SetConfigStmt) Restore(ctx *format.RestoreCtx) error {
+	ctx.WriteKeyWord("SET CONFIG ")
+	ctx.WritePlain(n.ComponentOrInstance + " " + n.Name + "=")
+	return n.Value.Restore(ctx)
+}
+
+func (n *SetConfigStmt) Accept(v Visitor) (Node, bool) {
+	newNode, skipChildren := v.Enter(n)
+	if skipChildren {
+		return v.Leave(newNode)
+	}
+	n = newNode.(*SetConfigStmt)
+	if node, ok := n.Value.Accept(v); !ok {
+		return n, false
+	} else {
+		n.Value = node.(ExprNode)
+	}
+	return v.Leave(n)
+}
+
+/*
+// Restore implements Node interface.
+func (n *SelectIntoOption) Restore(ctx *format.RestoreCtx) error {
+	if n.Tp != SelectIntoOutfile {
+		// only support SELECT ... INTO OUTFILE now
+		return errors.New("Unsupported SelectionInto type")
+	}
+
+	ctx.WriteKeyWord("INTO OUTFILE ")
+	ctx.WriteString(n.FileName)
+	if n.FieldsInfo != nil {
+		if err := n.FieldsInfo.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore SelectInto.FieldsInfo")
+		}
+	}
+	if n.LinesInfo != nil {
+		if err := n.LinesInfo.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore SelectInto.LinesInfo")
+		}
+	}
+	return nil
+}
+
+// Accept implements Node Accept interface.
+func (n *SelectIntoOption) Accept(v Visitor) (Node, bool) {
+	newNode, skipChildren := v.Enter(n)
+	if skipChildren {
+		return v.Leave(newNode)
+	}
+	return v.Leave(n)
+}
+*/
+
 /*
 // SetCharsetStmt is a statement to assign values to character and collation variables.
 // See https://dev.mysql.com/doc/refman/5.7/en/set-statement.html

@@ -1025,6 +1025,14 @@ func (s *testParserSuite) TestDBAStmt(c *C) {
 		{"set names utf8, @@session.sql_mode=1;", true, "SET NAMES 'utf8', @@SESSION.`sql_mode`=1"},
 		{"set @@session.sql_mode=1, names utf8, charset utf8;", true, "SET @@SESSION.`sql_mode`=1, NAMES 'utf8', NAMES 'utf8'"},
 
+		// for set config
+		{"set config TiKV Log.Level='info'", true, "SET CONFIG TiKV Log.Level='info'"},
+		{"set config tikv Log.Level='info'", true, "SET CONFIG tikv Log.Level='info'"},
+		{"set config PD Log.Level='info'", true, "SET CONFIG PD Log.Level='info'"},
+		{"set config pd Log.Level='info'", true, "SET CONFIG pd Log.Level='info'"},
+		{"set config TiDB Log.Level='info'", true, "SET CONFIG TiDB Log.Level='info'"},
+		{"set config tidb Log.Level='info'", true, "SET CONFIG TiDB Log.Level='info'"},
+
 		// for FLUSH statement
 		{"flush no_write_to_binlog tables tbl1 with read lock", true, "FLUSH NO_WRITE_TO_BINLOG TABLES `tbl1` WITH READ LOCK"},
 		{"flush table", true, "FLUSH TABLES"},

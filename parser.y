@@ -90,6 +90,7 @@ import (
 	character         "CHARACTER"
 	charType          "CHAR"
 	check             "CHECK"
+	config            "CONFIG"
 	collate           "COLLATE"
 	column            "COLUMN"
 	constraint        "CONSTRAINT"
@@ -1002,6 +1003,7 @@ import (
 	SequenceOptionList                     "Create sequence option list"
 	SetRoleOpt                             "Set role options"
 	SetDefaultRoleOpt                      "Set default role options"
+	ComponentOrInstance                    "Component or instance"
 	ShowTargetFilterable                   "Show target that can be filtered by WHERE or LIKE"
 	ShowDatabaseNameOpt                    "Show tables/columns statement database name option"
 	ShowTableAliasOpt                      "Show table alias option"
@@ -7725,6 +7727,24 @@ SetStmt:
 			}
 		}
 		$$ = &ast.SetStmt{Variables: assigns}
+	}
+|	"SET" "CONFIG" ComponentOrInstance VariableName EqOrAssignmentEq SetExpr
+	{
+		$$ = &ast.SetConfigStmt{ComponentOrInstance: $3.(string), Name: $4, Value: $6}
+	}
+
+ComponentOrInstance:
+	stringLit
+	{
+		$$ = $1
+	}
+|	identifier
+	{
+		$$ = $1
+	}
+|	"TIDB"
+	{
+		$$ = "TiDB"
 	}
 
 SetRoleStmt:
